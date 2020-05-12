@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "625564291677",
+    "firebase_url": "https://daily-do-fffa7.firebaseio.com",
+    "project_id": "daily-do-fffa7",
+    "storage_bucket": "daily-do-fffa7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625564291677:android:8fa7c518fd56fe5e8c73b4",
+        "android_client_info": {
+          "package_name": "com.example.daily_do"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "625564291677-7oeg4dlfraafbjkei04mtlpedfpc1kmo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuJSMKmPFdj_zaJka-kShRXBj6l10UK90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "625564291677-7oeg4dlfraafbjkei04mtlpedfpc1kmo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
