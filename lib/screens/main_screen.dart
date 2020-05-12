@@ -2,6 +2,7 @@ import 'package:daily_do/screens/login_screen.dart';
 import 'package:daily_do/services/auth.dart';
 import 'package:daily_do/services/models.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -13,13 +14,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
 
-  List<Todo> todoList = [
-    Todo(title: 'Milk sucks', isDone: false),
-    Todo(title: 'I eat frogs', isDone: false),
-    Todo(title: 'Sometiems the winds is loud', isDone: false),
-    Todo(title: 'carrots only good when not bad', isDone: false),
-    Todo(title: 'Swing on poles', isDone: false),
-  ];
+  List<Todo> todoList;
 
   void onTodoTap(Todo todo, bool newVal) {
     setState(() {
@@ -29,6 +24,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    todoList = Provider.of<List<Todo>>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Daily Do'),
@@ -43,6 +41,65 @@ class _MainScreenState extends State<MainScreen> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+        ),
+        onPressed: () async {
+          TextEditingController _textController = TextEditingController();
+
+          await showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (BuildContext context) {
+              return SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        child: TextField(
+                          controller: _textController,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "New Todo",
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      ButtonBar(
+                        children: <Widget>[
+                          FlatButton(
+                            child: Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            onPressed: () {
+                              Todo todo = Todo(title: _textController.text);
+                              todo.addToDb();
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              );
+            }
+          );
+        },
       ),
       drawer: Drawer(
         child: ListView(
@@ -73,21 +130,35 @@ class _TodoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: <Widget>[
-          Checkbox(
-            value: todo.isDone,
-            onChanged: (newVal) {
-              // Todo - Make This work
-              print(newVal);
-            },
-          ),
-          Text(
-            todo.title,
-          ),
-        ],
-      ),
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Checkbox(
+              value: todo.isDone,
+              onChanged: (newVal) {
+                todo.updateIsDone(newVal);
+              },
+            ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Text(
+                  todo.title,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Container(
+          width: double.infinity,
+          height: 1,
+          color: Colors.grey[900],
+        ),
+      ],
     );
   }
 }

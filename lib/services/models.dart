@@ -1,29 +1,50 @@
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:daily_do/services/db.dart';
+import 'package:daily_do/services/globals.dart';
+
 class Todo {
 
   String id;
-  //Document<User> doc;
+  Document<Todo> doc;
   String title;
   bool isDone;
 
   Todo({
     this.id,
-    //this.doc,
+    this.doc,
     this.title,
     this.isDone,
   });
 
-  /*
-  factory User.fromFirestore(DocumentSnapshot doc) {
+  factory Todo.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
 
-    return User(
-      uid: data['uid'],
-      doc: Document<User>(path: doc.reference.path),
-      email: data['email'],
-      lastDay: DateTime.fromMillisecondsSinceEpoch(data['lastDay'].seconds * 1000),
+    return Todo(
+      id: data['id'],
+      doc: Document<Todo>(path: doc.reference.path),
+      title: data['title'],
+      isDone: data['isDone'],
     );
   }
-  */
+
+  void addToDb() {
+    Global.todoCollection.upsert({
+      "title": this.title,
+      "isDone": false,
+    });
+  }
+
+  void updateIsDone(bool newVal) {
+    this.isDone = newVal;
+    _updateDb();
+  }
+
+  void _updateDb() {
+    doc.upsert({
+      'title': this.title,
+      'isDone': this.isDone,
+    });
+  }
 }
