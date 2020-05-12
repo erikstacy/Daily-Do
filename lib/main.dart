@@ -1,6 +1,7 @@
 import 'package:daily_do/screens/login_screen.dart';
 import 'package:daily_do/screens/main_screen.dart';
 import 'package:daily_do/screens/register_screen.dart';
+import 'package:daily_do/screens/settings.dart';
 import 'package:daily_do/screens/splash_screen.dart';
 import 'package:daily_do/services/globals.dart';
 import 'package:daily_do/services/models.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
           MainScreen.id: (context) => MainScreen(),
           LoginScreen.id: (context) => LoginScreen(),
           RegisterScreen.id: (context) => RegisterScreen(),
+          SettingsScreen.id: (context) => SettingsScreen(),
         },
         theme: ThemeData.dark(),
       ),

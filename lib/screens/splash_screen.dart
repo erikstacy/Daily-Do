@@ -2,6 +2,7 @@ import 'package:daily_do/screens/login_screen.dart';
 import 'package:daily_do/screens/main_screen.dart';
 import 'package:daily_do/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,9 +17,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   AuthService _auth = AuthService();
 
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
   @override
   void initState() {
     super.initState();
+
+    var initializationSettingsAndroid = new AndroidInitializationSettings('@mipmap/ic_launcher'); 
+
+    var initializationSettingsIOS = new IOSInitializationSettings();
+
+    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     _getUser();
   }

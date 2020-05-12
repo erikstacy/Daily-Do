@@ -1,9 +1,12 @@
 import 'package:daily_do/screens/login_screen.dart';
+import 'package:daily_do/screens/settings.dart';
 import 'package:daily_do/screens/todo_screen.dart';
 import 'package:daily_do/services/auth.dart';
 import 'package:daily_do/services/models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
 
@@ -13,9 +16,42 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   List<Todo> todoList;
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+  @override
+  void initState() { 
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      // user returned to our app
+    } else if (state == AppLifecycleState.inactive) {
+      // app is inactive
+    } else if (state == AppLifecycleState.paused) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      if((prefs.getBool('enable_notifications') ?? false)) {
+        var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+          'your channel id', 'your channel name', 'your channel description', importance: Importance.Max, priority: Priority.High, ticker: 'ticker', playSound: false, enableVibration: false);
+        var iOSPlatformChannelSpecifics = IOSNotificationDetails(presentSound: false);
+        var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        flutterLocalNotificationsPlugin.show(0, '${todoList[0].title}', 'YOU GOT THIS', platformChannelSpecifics,);
+      }
+    }
+  }
 
   void onTodoTap(Todo todo, bool newVal) {
     setState(() {
@@ -135,6 +171,12 @@ class _MainScreenState extends State<MainScreen> {
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
+              ListTile(
+                title: Text('Settings'),
+                onTap: () {
+                  Navigator.pushNamed(context, SettingsScreen.id);
+                },
+              ),
               ListTile(
                 title: Text('Sign out'),
                 onTap: () {
