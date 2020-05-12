@@ -1,4 +1,5 @@
 import 'package:daily_do/screens/login_screen.dart';
+import 'package:daily_do/screens/todo_screen.dart';
 import 'package:daily_do/services/auth.dart';
 import 'package:daily_do/services/models.dart';
 import 'package:flutter/material.dart';
@@ -132,26 +133,31 @@ class _TodoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Checkbox(
-              value: todo.isDone,
-              onChanged: (newVal) {
-                todo.updateIsDone(newVal);
-              },
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Text(
-                  todo.title,
-                  style: TextStyle(
-                    fontSize: 16,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TodoScreen(todo: todo,)));
+          },
+          child: Row(
+            children: <Widget>[
+              Checkbox(
+                value: todo.isDone,
+                onChanged: (newVal) {
+                  todo.updateIsDone(newVal);
+                },
+              ),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  child: Text(
+                    todo.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         Container(
           width: double.infinity,

@@ -41,6 +41,15 @@ class Todo {
     _updateDb();
   }
 
+  void updateTitle(String newVal) {
+    this.title = newVal;
+    _updateDb();
+  }
+
+  void delete() {
+    doc.delete();
+  }
+
   void _updateDb() {
     doc.upsert({
       'title': this.title,
