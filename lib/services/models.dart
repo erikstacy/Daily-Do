@@ -42,7 +42,11 @@ class Todo {
 
   void updateIsDone(bool newVal) {
     this.isDone = newVal;
-    _updateDb();
+    Global.completedCollection.upsert({
+      'title': this.title,
+      'isDone': this.isDone,
+    });
+    delete();
   }
 
   void updateTitle(String newVal) {
@@ -65,5 +69,45 @@ class Todo {
       'isDone': this.isDone,
       'position': this.position,
     });
+  }
+}
+
+class Completed {
+
+  String id;
+  Document<Completed> doc;
+  String title;
+  bool isDone;
+
+  Completed({
+    this.id,
+    this.doc,
+    this.title,
+    this.isDone,
+  });
+
+  factory Completed.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data;
+
+    return Completed(
+      id: data['id'],
+      doc: Document<Completed>(path: doc.reference.path),
+      title: data['title'],
+      isDone: data['isDone'],
+    );
+  }
+
+  void updateIsDone(bool newVal) {
+    this.isDone = newVal;
+    Global.todoCollection.upsert({
+      'title': this.title,
+      'isDone': this.isDone,
+      'position': Global.todoLength,
+    });
+    delete();
+  }
+
+  void delete() {
+    doc.delete();
   }
 }

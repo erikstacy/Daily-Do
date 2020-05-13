@@ -33,6 +33,7 @@ class _TodoScreenState extends State<TodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         actions: <Widget>[
           IconButton(
@@ -43,6 +44,7 @@ class _TodoScreenState extends State<TodoScreen> {
             },
           ),
         ],
+        backgroundColor: Colors.black,
       ),
       body: Column(
         children: <Widget>[

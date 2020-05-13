@@ -1,7 +1,10 @@
+import 'package:daily_do/screens/completed_list_screen.dart';
 import 'package:daily_do/screens/login_screen.dart';
 import 'package:daily_do/screens/settings.dart';
+import 'package:daily_do/screens/todo_list_screen.dart';
 import 'package:daily_do/screens/todo_screen.dart';
 import 'package:daily_do/services/auth.dart';
+import 'package:daily_do/services/globals.dart';
 import 'package:daily_do/services/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -67,106 +70,22 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     if (todoList != null) {
 
       todoList.sort((a, b) => a.position.compareTo(b.position));
+      Global.todoLength = todoList.length;
 
       return Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text('Daily Do'),
           centerTitle: true,
+          backgroundColor: Colors.black,
         ),
-        body: Container(
-          child: ReorderableListView(
-            onReorder: (oldIndex, newIndex) {
-              if (newIndex > oldIndex) {
-                newIndex -= 1;
-              }
-
-              Todo tempTodo = todoList.removeAt(oldIndex);
-              todoList.insert(newIndex, tempTodo);
-
-              for (int i = 0; i < todoList.length; i++) {
-                todoList[i].updatePosition(i);
-              }
-            },
-            scrollDirection: Axis.vertical,
-            children: List.generate(
-              todoList.length,
-              (index) {
-                return _TodoCard(
-                  todo: todoList[index],
-                  key: Key('$index'),
-                );
-              }
-            ),
-          ),
-          /*
-          child: ListView.builder(
-            itemCount: todoList.length,
-            itemBuilder: (context, index) {
-              return _TodoCard(
-                todo: todoList[index],
-              );
-            },
-          ),
-          */
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-          ),
-          onPressed: () async {
-            TextEditingController _textController = TextEditingController();
-
-            await showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (BuildContext context) {
-                return SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                          child: TextField(
-                            controller: _textController,
-                            autofocus: true,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "New Todo",
-                              hintStyle: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        ButtonBar(
-                          children: <Widget>[
-                            FlatButton(
-                              child: Text(
-                                'Save',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              onPressed: () {
-                                Todo todo = Todo(title: _textController.text, position: todoList.length);
-                                todo.addToDb();
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  )
-                );
-              }
-            );
-          },
+        body: Column(
+          children: <Widget>[
+            SizedBox(height: 10,),
+            _TodoCard(todoList: todoList),
+            SizedBox(height: 15,),
+            _CompletedCard(),
+          ],
         ),
         drawer: Drawer(
           child: ListView(
@@ -198,53 +117,104 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
 class _TodoCard extends StatelessWidget {
 
-  final Todo todo;
-  final VoidCallback onChecked;
-  final Key key;
+  final List<Todo> todoList;
 
-  _TodoCard({
-    this.todo,
-    this.onChecked,
-    this.key,
-  }) : super(key: key);
+  _TodoCard({ this.todoList });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => TodoScreen(todo: todo,)));
-          },
-          child: Row(
-            children: <Widget>[
-              Checkbox(
-                value: todo.isDone,
-                onChanged: (newVal) {
-                  todo.updateIsDone(newVal);
-                },
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                  child: Text(
-                    todo.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          height: 1,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, TodoListScreen.id);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
           color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(20),
         ),
-      ],
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  SizedBox(width: 10,),
+                  Icon(
+                    Icons.check_box_outline_blank,
+                    size: 20,
+                  ),
+                  SizedBox(width: 10,),
+                  Text(
+                    'Todo',
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              ),
+              child: Text(todoList[0].title),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CompletedCard extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, CompletedListScreen.id);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: Colors.grey[800],
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  SizedBox(width: 10,),
+                  Icon(
+                    Icons.check_box,
+                    size: 20,
+                  ),
+                  SizedBox(width: 10,),
+                  Text(
+                    'Completed',
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              ),
+              child: Text('Check out your completed todos'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
